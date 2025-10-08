@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Anniversary Connections 💛</title>
+<style>
+  body {
+    font-family: Inter, system-ui, sans-serif;
+    background: #f8fafc;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    margin-bottom: 16px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(80px, 120px));
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .tile {
+    background: #e2e8f0;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    user-select: none;
+  }
+  .tile.selected {
+    background: #a5b4fc;
+    transform: scale(1.05);
+  }
+  .tile.found {
+    cursor: default;
+    opacity: 0.85;
+  }
+  #message {
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .category {
+    margin: 6px 0;
+    font-weight: 600;
+  }
+  button {
+    padding: 8px 14px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<h1>Alyse’s Connections 💕</h1>
+<div id="grid"></div>
+<button id="shuffleBtn">🔀 Shuffle</button>
+<div id="message"></div>
+
+<script>
+// === Customize your categories here ===
+const categories = [
+  {
+    name: "Sailor Qualities",
+    words: ["Tongue Out", "Skin Tag", "Black", "Sassy"],
+    color: "#facc15" // yellow
+  },
+  {
+    name: "Devyn and Danny Slang Terms",
+    words: ["Mixing", "Levitating", "Flaps", "Finger"],
+    color: "#22c55e" // green
+  },
+  {
+    name: "Benjamin Family Initials",
+    words: ["C", "D", "J", "A"],
+    color: "#3b82f6" // blue
+  },
+  {
+    name: "Vanderpump Rules Characters Plus a Letter",
+    words: ["Lisao", "Ajax", "Tomb", "Blala"],
+    color: "#a855f7" // purple
+  }
+];
+
+// Shuffle words into one list
+let allWords = categories.flatMap(c => c.words)
+  .sort(() => Math.random() - 0.5);
+
+const grid = document.getElementById("grid");
+const message = document.getElementById("message");
+const shuffleBtn = document.getElementById("shuffleBtn");
+
+let selected = [];
+let foundGroups = 0;
+
+function renderGrid() {
+  grid.innerHTML = "";
+  allWords.forEach(w => {
+    const div = document.createElement("div");
+    div.className = "tile";
+    div.textContent = w;
+    div.onclick = () => selectWord(w, div);
+    grid.appendChild(div);
+  });
+}
+
+function selectWord(word, el) {
+  if (el.classList.contains("found")) return;
+  if (selected.includes(word)) {
+    selected = selected.filter(w => w !== word);
+    el.classList.remove("selected");
+    return;
+  }
+  if (selected.length < 4) {
+    selected.push(word);
+    el.classList.add("selected");
+  }
+  if (selected.length === 4) checkGroup();
+}
+
+function checkGroup() {
+  const matched = categories.find(cat =>
+    cat.words.every(w => selected.includes(w))
+  );
+  if (matched) {
+    // Found a group!
+    foundGroups++;
+    document.querySelectorAll(".tile.selected").forEach(el => {
+      el.classList.remove("selected");
+      el.classList.add("found");
+      el.style.background = matched.color;
+    });
+    message.innerHTML = `✅ You found: <strong>${matched.name}</strong>`;
+    selected = [];
+    if (foundGroups === 4) {
+      setTimeout(() => {
+        message.innerHTML = "🎉 You solved them all!<br><br><strong>Next clue:
