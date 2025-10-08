@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Anniversary Connections 💛</title>
+<title>Alyse’s Connections 💕</title>
 <style>
   :root {
     --yellow: #facc15;
@@ -30,18 +30,27 @@
     margin-bottom: 16px;
   }
 
+  #foundArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    margin-bottom: 16px;
+  }
+
   #grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(80px, 100px));
+    grid-template-columns: repeat(4, 110px);
     gap: 10px;
     margin-bottom: 20px;
     transition: all 0.3s ease;
   }
 
   .tile {
+    width: 110px;
+    height: 110px;
     background: var(--gray);
     border-radius: 10px;
-    aspect-ratio: 1 / 1; /* makes them square */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -50,6 +59,7 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
     user-select: none;
+    font-size: 15px;
   }
 
   .tile.selected {
@@ -92,9 +102,10 @@
     margin-bottom: 6px;
   }
 
-  .found-group .tile {
-    flex: 1;
-    aspect-ratio: 1 / 1;
+  .group-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    text-align: center;
   }
 
   #solved {
@@ -104,7 +115,7 @@
 </style>
 </head>
 <body>
-<h1>Alyse’s Connections 💕</h1>
+<h1>Connections 💕</h1>
 <div id="foundArea"></div>
 <div id="grid"></div>
 <button id="shuffleBtn">🔀 Shuffle</button>
@@ -131,7 +142,7 @@ const categories = [
     color: "#3b82f6" // blue
   },
   {
-    name: "Vanderpump Rules Characters Plus a Letter",
+    name: "Vanderpump Rules +1",
     words: ["Lisao", "Ajax", "Tomb", "Blala"],
     color: "#a855f7" // purple
   }
@@ -186,14 +197,25 @@ function checkGroup() {
       el.style.background = matched.color;
     });
 
-    // Move them into their own row (like NYT Connections)
+    // === Create a container row that stays same size ===
+    const wrapper = document.createElement("div");
+    wrapper.style.display = "flex";
+    wrapper.style.flexDirection = "column";
+    wrapper.style.alignItems = "center";
+
+    const title = document.createElement("div");
+    title.className = "group-title";
+    title.textContent = matched.name;
+    wrapper.appendChild(title);
+
     const groupRow = document.createElement("div");
     groupRow.className = "group-row";
     selectedTiles.forEach(el => {
       grid.removeChild(el);
       groupRow.appendChild(el);
     });
-    foundArea.appendChild(groupRow);
+    wrapper.appendChild(groupRow);
+    foundArea.appendChild(wrapper);
 
     message.innerHTML = `✅ You found: <strong>${matched.name}</strong>`;
     selected = [];
