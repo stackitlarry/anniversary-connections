@@ -69,6 +69,8 @@
 <div id="message"></div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  
 // === Customize your categories here ===
 const categories = [
   {
@@ -93,7 +95,6 @@ const categories = [
   }
 ];
 
-// Shuffle words into one list
 let allWords = categories.flatMap(c => c.words)
   .sort(() => Math.random() - 0.5);
 
@@ -134,7 +135,6 @@ function checkGroup() {
     cat.words.every(w => selected.includes(w))
   );
   if (matched) {
-    // Found a group!
     foundGroups++;
     document.querySelectorAll(".tile.selected").forEach(el => {
       el.classList.remove("selected");
@@ -145,4 +145,30 @@ function checkGroup() {
     selected = [];
     if (foundGroups === 4) {
       setTimeout(() => {
+        message.innerHTML = "🎉 You solved them all!<br><br><strong>Next clue:</strong> Check under your pillow 💌";
+      }, 800);
+    }
+  } else {
+    message.textContent = "❌ Not a match. Try again!";
+    setTimeout(() => {
+      document.querySelectorAll(".tile.selected").forEach(el => el.classList.remove("selected"));
+      selected = [];
+      message.textContent = "";
+    }, 800);
+  }
+}
+
+shuffleBtn.onclick = () => {
+  allWords = allWords.sort(() => Math.random() - 0.5);
+  renderGrid();
+};
+
+renderGrid();
+
+});
+
+    if (foundGroups === 4) {
+      setTimeout(() => {
         message.innerHTML = "🎉 You solved them all!<br><br><strong>Next clue:
+
+        </script>
