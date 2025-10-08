@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Anniversary Connections 💛</title>
 <style>
+  :root {
+    --yellow: #facc15;
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --gray: #e2e8f0;
+    --selected: #a5b4fc;
+  }
+
   body {
     font-family: Inter, system-ui, sans-serif;
     background: #f8fafc;
@@ -16,41 +25,49 @@
     margin: 0;
     padding: 20px;
   }
+
   h1 {
     margin-bottom: 16px;
   }
+
   #grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(80px, 120px));
+    grid-template-columns: repeat(4, minmax(80px, 100px));
     gap: 10px;
     margin-bottom: 20px;
+    transition: all 0.3s ease;
   }
+
   .tile {
-    background: #e2e8f0;
-    border-radius: 8px;
-    padding: 14px;
+    background: var(--gray);
+    border-radius: 10px;
+    aspect-ratio: 1 / 1; /* makes them square */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
     user-select: none;
   }
+
   .tile.selected {
-    background: #a5b4fc;
+    background: var(--selected);
     transform: scale(1.05);
   }
+
   .tile.found {
     cursor: default;
-    opacity: 0.85;
+    opacity: 0.95;
   }
+
   #message {
     margin-top: 10px;
     font-weight: 600;
+    text-align: center;
   }
-  .category {
-    margin: 6px 0;
-    font-weight: 600;
-  }
+
   button {
     padding: 8px 14px;
     border: none;
@@ -60,10 +77,35 @@
     cursor: pointer;
     font-weight: 600;
   }
+
+  .group-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0;
+    transition: all 0.3s ease;
+  }
+
+  .found-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .found-group .tile {
+    flex: 1;
+    aspect-ratio: 1 / 1;
+  }
+
+  #solved {
+    margin-top: 20px;
+    font-size: 1.1rem;
+  }
 </style>
 </head>
 <body>
-<h1>Connections</h1>
+<h1>Alyse’s Connections 💕</h1>
+<div id="foundArea"></div>
 <div id="grid"></div>
 <button id="shuffleBtn">🔀 Shuffle</button>
 <div id="message"></div>
@@ -101,6 +143,7 @@ let allWords = categories.flatMap(c => c.words)
 const grid = document.getElementById("grid");
 const message = document.getElementById("message");
 const shuffleBtn = document.getElementById("shuffleBtn");
+const foundArea = document.getElementById("foundArea");
 
 let selected = [];
 let foundGroups = 0;
@@ -136,13 +179,25 @@ function checkGroup() {
   );
   if (matched) {
     foundGroups++;
-    document.querySelectorAll(".tile.selected").forEach(el => {
+    const selectedTiles = Array.from(document.querySelectorAll(".tile.selected"));
+    selectedTiles.forEach(el => {
       el.classList.remove("selected");
       el.classList.add("found");
       el.style.background = matched.color;
     });
+
+    // Move them into their own row (like NYT Connections)
+    const groupRow = document.createElement("div");
+    groupRow.className = "group-row";
+    selectedTiles.forEach(el => {
+      grid.removeChild(el);
+      groupRow.appendChild(el);
+    });
+    foundArea.appendChild(groupRow);
+
     message.innerHTML = `✅ You found: <strong>${matched.name}</strong>`;
     selected = [];
+
     if (foundGroups === 4) {
       setTimeout(() => {
         message.innerHTML = "🎉 You solved them all!<br><br><strong>Next clue:</strong> Check under your pillow 💌";
